@@ -2,6 +2,7 @@ require 'rack/ssl'
 
 require 'test/unit'
 require 'rack/test'
+require_relative 'capture_stdout.rb'
 
 class TestSSL < Test::Unit::TestCase
   include Rack::Test::Methods
@@ -34,6 +35,13 @@ class TestSSL < Test::Unit::TestCase
     assert last_response.redirect?
     assert_equal "https://example.org/path?key=value",
       last_response.headers['Location']
+  end
+
+  def test_logs_redirect
+    out = capture_stdout{get "http://example.org/path?key=value"}
+    assert_equal \
+      "[Rack::SSL] http://example.org/path?key=value -> https://example.org/path?key=value\n",
+      out
   end
 
   def test_exclude_from_redirect

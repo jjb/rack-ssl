@@ -48,11 +48,14 @@ module Rack
       def redirect_to_https(env)
         req        = Request.new(env)
         url        = URI(req.url)
+        old_url    = url.to_s
         url.scheme = "https"
         url.host   = @host if @host
         status     = %w[GET HEAD].include?(req.request_method) ? 301 : 307
         headers    = hsts_headers.merge('Content-Type' => 'text/html',
                                         'Location'     => url.to_s)
+
+        puts "[Rack::SSL] #{old_url} -> #{url.to_s}\n"
 
         [status, headers, []]
       end
